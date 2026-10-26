@@ -1,0 +1,27 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Build with -DSHIELD=arduino_nano_xl_link_monica, which adds the esp8266
+ * node on sercom1. The driver is not used here, only the UART.
+ */
+
+/* MCUboot starts the watchdog; the app has to feed it. */
+&wdt {
+	status = "okay";
+};
+
+/* The ESP-AT driver would bind at boot, here the UART is used directly. */
+&sercom1 {
+	/delete-property/ zephyr,deferred-init;
+};
+
+/* Boot mode lives in retained RAM shared with MCUboot. */
+#include "../../variants/arduino_nano_xl_link_pic32ck2051sg01144/retained_mem.dtsi"
+
+/* Print on USB CDC ACM instead of UART6 (D0/D1). */
+/ {
+	chosen {
+		zephyr,console = &board_cdc_acm_uart;
+		zephyr,shell-uart = &board_cdc_acm_uart;
+	};
+};
